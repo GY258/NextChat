@@ -12,6 +12,7 @@ import MaskIcon from "../icons/mask.svg";
 import McpIcon from "../icons/mcp.svg";
 import DragIcon from "../icons/drag.svg";
 import DiscoveryIcon from "../icons/discovery.svg";
+import DocumentIcon from "../icons/document.svg";
 
 import Locale from "../locales";
 
@@ -37,6 +38,7 @@ const DISCOVERY = [
   { name: Locale.Plugin.Name, path: Path.Plugins },
   { name: "Stable Diffusion", path: Path.Sd },
   { name: Locale.SearchChat.Page.Title, path: Path.SearchChat },
+  { name: "Business Documents", path: Path.Documents },
 ];
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
@@ -280,6 +282,16 @@ export function SideBar(props: { className?: string }) {
               shadow
             />
           )}
+          <IconButton
+            icon={<DocumentIcon />}
+            text={shouldNarrow ? undefined : "Documents"}
+            className={styles["sidebar-bar-button"]}
+            onClick={() => {
+              navigate(Path.Documents, { state: { fromHome: true } });
+            }}
+            shadow
+            title="Business Documents - Upload and manage your business documents for AI assistance"
+          />
           <IconButton
             icon={<DiscoveryIcon />}
             text={shouldNarrow ? undefined : Locale.Discovery.Name}

@@ -30,6 +30,7 @@ import { type ClientApi, getClientApi } from "../client/api";
 import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
+import { initializeDocumentRAG } from "../utils/document-init";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -47,6 +48,14 @@ const Artifacts = dynamic(async () => (await import("./artifacts")).Artifacts, {
 const Settings = dynamic(async () => (await import("./settings")).Settings, {
   loading: () => <Loading noLogo />,
 });
+
+const DocumentManager = dynamic(
+  async () =>
+    (await import("./document-manager-switcher")).DocumentManagerSwitcher,
+  {
+    loading: () => <Loading noLogo />,
+  },
+);
 
 const Chat = dynamic(async () => (await import("./chat")).Chat, {
   loading: () => <Loading noLogo />,
@@ -202,6 +211,7 @@ function Screen() {
             <Route path={Path.Chat} element={<Chat />} />
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
+            <Route path={Path.Documents} element={<DocumentManager />} />
           </Routes>
         </WindowContent>
       </>
@@ -256,6 +266,9 @@ export function Home() {
       }
     };
     initMcp();
+
+    // Initialize Document RAG
+    initializeDocumentRAG();
   }, []);
 
   if (!useHasHydrated()) {

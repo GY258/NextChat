@@ -60,6 +60,7 @@ import {
   useAppConfig,
   useChatStore,
   usePluginStore,
+  ChatSession,
 } from "../store";
 
 import {
@@ -183,7 +184,7 @@ export function SessionConfigModel(props: { onClose: () => void }) {
               if (await showConfirm(Locale.Memory.ResetConfirm)) {
                 chatStore.updateTargetSession(
                   session,
-                  (session) => (session.memoryPrompt = ""),
+                  (session: ChatSession) => (session.memoryPrompt = ""),
                 );
               }
             }}
@@ -209,7 +210,7 @@ export function SessionConfigModel(props: { onClose: () => void }) {
             updater(mask);
             chatStore.updateTargetSession(
               session,
-              (session) => (session.mask = mask),
+              (session: ChatSession) => (session.mask = mask),
             );
           }}
           shouldSyncFromGlobal
@@ -389,7 +390,7 @@ function ClearContextDivider() {
       onClick={() =>
         chatStore.updateTargetSession(
           session,
-          (session) => (session.clearContextIndex = undefined),
+          (session: ChatSession) => (session.clearContextIndex = undefined),
         )
       }
     >
@@ -583,7 +584,7 @@ export function ChatActions(props: {
     if (isUnavailableModel && models.length > 0) {
       // show next model to default model if exist
       let nextModel = models.find((model) => model.isDefault) || models[0];
-      chatStore.updateTargetSession(session, (session) => {
+      chatStore.updateTargetSession(session, (session: ChatSession) => {
         session.mask.modelConfig.model = nextModel.name;
         session.mask.modelConfig.providerName = nextModel?.provider
           ?.providerName as ServiceProvider;
@@ -662,7 +663,7 @@ export function ChatActions(props: {
           text={Locale.Chat.InputActions.Clear}
           icon={<BreakIcon />}
           onClick={() => {
-            chatStore.updateTargetSession(session, (session) => {
+            chatStore.updateTargetSession(session, (session: ChatSession) => {
               if (session.clearContextIndex === session.messages.length) {
                 session.clearContextIndex = undefined;
               } else {
@@ -694,7 +695,7 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const [model, providerName] = getModelProvider(s[0]);
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession(session, (session: ChatSession) => {
                 session.mask.modelConfig.model = model as ModelType;
                 session.mask.modelConfig.providerName =
                   providerName as ServiceProvider;
@@ -733,7 +734,7 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const size = s[0];
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession(session, (session: ChatSession) => {
                 session.mask.modelConfig.size = size;
               });
               showToast(size);
@@ -760,7 +761,7 @@ export function ChatActions(props: {
             onSelection={(q) => {
               if (q.length === 0) return;
               const quality = q[0];
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession(session, (session: ChatSession) => {
                 session.mask.modelConfig.quality = quality;
               });
               showToast(quality);
@@ -787,7 +788,7 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const style = s[0];
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession(session, (session: ChatSession) => {
                 session.mask.modelConfig.style = style;
               });
               showToast(style);
@@ -818,7 +819,7 @@ export function ChatActions(props: {
             }))}
             onClose={() => setShowPluginSelector(false)}
             onSelection={(s) => {
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession(session, (session: ChatSession) => {
                 session.mask.plugin = s as string[];
               });
             }}
@@ -874,7 +875,7 @@ export function EditMessageModal(props: { onClose: () => void }) {
             onClick={() => {
               chatStore.updateTargetSession(
                 session,
-                (session) => (session.messages = messages),
+                (session: ChatSession) => (session.messages = messages),
               );
               props.onClose();
             }}
@@ -1868,7 +1869,8 @@ function _Chat() {
                             </div>
                             {!isUser && (
                               <div className={styles["chat-model-name"]}>
-                                {message.model}
+                                {message.model ||
+                                  session.mask.modelConfig.model}
                               </div>
                             )}
 

@@ -63,6 +63,10 @@ export type ChatMessage = RequestMessage & {
   tools?: ChatMessageTool[];
   audio_url?: string;
   isMcpResponse?: boolean;
+  attr?: {
+    documentSources?: string[];
+    [key: string]: any;
+  };
 };
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
@@ -412,10 +416,49 @@ export const useChatStore = createPersistStore(
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
+        // BMF Document Search Enhancement
+        let enhancedContent = content;
+        let documentContext = "";
+        let documentSources: string[] = [];
+
+        // Only enhance if not MCP response and content is substantial
+        if (!isMcpResponse && typeof content === "string") {
+          try {
+            console.log(
+              "🔍 [Chat Store] Attempting BMF document enhancement...",
+            );
+            const { enhanceMessageWithBMFDocuments, shouldUseBMFDocumentRAG } =
+              await import("../utils/bmf-document-rag-plugin");
+
+            if (shouldUseBMFDocumentRAG(content)) {
+              const enhancement = await enhanceMessageWithBMFDocuments(content);
+              if (enhancement.hasContext) {
+                enhancedContent = enhancement.enhancedMessage;
+                documentSources = enhancement.sources;
+                console.log(
+                  "✅ [Chat Store] BMF enhancement successful, sources:",
+                  documentSources,
+                );
+              } else {
+                console.log("ℹ️ [Chat Store] No BMF enhancement context found");
+              }
+            } else {
+              console.log(
+                "ℹ️ [Chat Store] Message does not qualify for BMF enhancement",
+              );
+            }
+          } catch (error) {
+            console.warn(
+              "⚠️ [Chat Store] BMF enhancement failed, continuing without enhancement:",
+              error,
+            );
+          }
+        }
+
         // MCP Response no need to fill template
         let mContent: string | MultimodalContent[] = isMcpResponse
           ? content
-          : fillTemplateWith(content, modelConfig);
+          : fillTemplateWith(enhancedContent, modelConfig);
 
         if (!isMcpResponse && attachImages && attachImages.length > 0) {
           mContent = [
@@ -433,6 +476,14 @@ export const useChatStore = createPersistStore(
           isMcpResponse,
         });
 
+        // Store document sources in user message for reference
+        if (documentSources.length > 0) {
+          userMessage.attr = {
+            ...userMessage.attr,
+            documentSources: documentSources,
+          };
+        }
+
         const botMessage: ChatMessage = createMessage({
           role: "assistant",
           streaming: true,
@@ -448,7 +499,20 @@ export const useChatStore = createPersistStore(
         get().updateTargetSession(session, (session) => {
           const savedUserMessage = {
             ...userMessage,
-            content: mContent,
+            content: isMcpResponse
+              ? content
+              : // Save original user content, not the enhanced version
+              !isMcpResponse && attachImages && attachImages.length > 0
+              ? [
+                  ...(content
+                    ? [{ type: "text" as const, text: content }]
+                    : []),
+                  ...attachImages.map((url) => ({
+                    type: "image_url" as const,
+                    image_url: { url },
+                  })),
+                ]
+              : content,
           };
           session.messages = session.messages.concat([
             savedUserMessage,
