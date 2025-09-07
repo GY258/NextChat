@@ -32,6 +32,16 @@ const nextConfig = {
   },
   experimental: {
     forceSwcTransforms: true,
+    webpackBuildWorker: false, // 禁用webpack worker以节省内存
+  },
+  // 优化编译性能
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // 减少构建时的警告
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
   },
 };
 
