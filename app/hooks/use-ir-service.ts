@@ -142,7 +142,12 @@ export function useIRService(autoInit = true) {
  * 仅用于获取服务状态的轻量级Hook
  */
 export function useIRServiceStatus() {
-  const [status, setStatus] = useState(null);
+  const [status, setStatus] = useState<{
+    isStarted: boolean;
+    startTime: number;
+    uptime: number;
+    config: IRServiceConfig;
+  } | null>(null);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
 
   const updateStatus = useCallback(() => {

@@ -119,14 +119,30 @@ export function createCustomIRConfig(
     memoryConfig: {
       ...baseConfig.memoryConfig,
       ...overrides.memoryConfig,
+    } as {
+      maxDocuments: number;
+      maxMemoryMB: number;
+      enableCompression: boolean;
     },
     databaseConfig: {
       ...baseConfig.databaseConfig,
       ...overrides.databaseConfig,
+    } as {
+      host: string;
+      port: number;
+      database: string;
+      username: string;
+      password: string;
+      connectionPool: number;
     },
     redisConfig: {
       ...baseConfig.redisConfig,
       ...overrides.redisConfig,
+    } as {
+      host: string;
+      port: number;
+      password?: string;
+      keyPrefix: string;
     },
   };
 }

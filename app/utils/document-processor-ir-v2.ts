@@ -675,7 +675,7 @@ export class IRDocumentProcessorV2 {
   /**
    * 提取并标准化词汇
    */
-  private extractAndNormalizeTerms(text: string): string[] {
+  public extractAndNormalizeTerms(text: string): string[] {
     const terms: string[] = [];
 
     const normalizedText = text

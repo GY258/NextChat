@@ -127,6 +127,8 @@ export interface IRIndexServiceInterface {
   // 统计信息
   updateIndexStats(stats: Omit<DatabaseIndexStats, "id">): Promise<void>;
   getIndexStats(): Promise<DatabaseIndexStats | null>;
+  getDocumentDistribution(): Promise<{ docId: string; termCount: number }[]>;
+  getTermDistribution(): Promise<{ term: string; frequency: number }[]>;
 
   // 维护操作
   reindexAll(): Promise<void>;

@@ -221,7 +221,7 @@ export const useIRDocumentStoreV2 = createPersistStore(
         query: string,
         maxTokens = 2000,
       ): Promise<string> {
-        const results = await get().searchDocuments(query, 10);
+        const results = await this.searchDocuments(query, 10);
 
         if (results.length === 0) {
           console.log("❌ [IR Store V2] No context found for query:", query);
@@ -482,8 +482,8 @@ export const useIRDocumentStoreV2 = createPersistStore(
       async getIndexStatistics(): Promise<any> {
         try {
           const indexStats = await indexService.getIndexStats();
-          const memoryStats = indexService.getMemoryStats
-            ? indexService.getMemoryStats()
+          const memoryStats = (indexService as any).getMemoryStats
+            ? (indexService as any).getMemoryStats()
             : null;
 
           return {
@@ -507,7 +507,7 @@ export const useIRDocumentStoreV2 = createPersistStore(
         limit = 50,
       ): Promise<{ term: string; frequency: number }[]> {
         try {
-          return await indexService.getTermDistribution();
+          return await (indexService as any).getTermDistribution();
         } catch (error) {
           console.error(
             "❌ [IR Store V2] Failed to get term distribution:",
