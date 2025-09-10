@@ -1,12 +1,28 @@
-version: "3.9"
 services:
   nextchat:
-    container_name: nextchat
-    image: yidadaa/chatgpt-next-web
+    build: .
+    container_name: nextchat-deepseek
     ports:
-      - "0.0.0.0:3000:3000"  # This allows external access
+      - "3000:3000"
     environment:
       - DEEPSEEK_API_KEY=sk-cf56f2572c704a70ad2e6792ad54f344
       - DEEPSEEK_URL=https://api.deepseek.com
-      - CODE=your_secure_password_here
-    restart: unless-stopped
+      - CODE=123
+      - NEXT_PUBLIC_BMF_ENABLED=true
+      - NEXT_PUBLIC_BMF_BASE_URL=/api/bmf
+      - BMF_SERVER_BASE_URL=http://host.docker.internal:5003
+      - NEXT_PUBLIC_BMF_MAX_CONTEXT_TOKENS=2000
+      - NEXT_PUBLIC_BMF_SEARCH_LIMIT=8
+      - NEXT_PUBLIC_BMF_INCLUDE_SNIPPETS=true
+      - NEXT_PUBLIC_BMF_HEALTH_CHECK_TIMEOUT=5000
+      - NEXT_PUBLIC_BMF_ENHANCE_MIN_LENGTH=0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    external_links:
+      - chinese-search-api:chinese-search-api
+    networks:
+      - nextchat-network
+
+networks:
+  nextchat-network:
+    driver: bridge

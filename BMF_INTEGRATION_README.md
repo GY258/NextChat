@@ -18,10 +18,15 @@ BMF 搜索服务集成允许 NextChat 在对话过程中自动搜索相关的业
 
 ### 1. BMF 搜索服务
 
-确保你的 BMF 搜索服务正在运行，并且可以通过以下 API 访问：
+确保你的 BMF 搜索服务正在运行，并且可以通过以下 API 访问（直接访问或通过 NextChat 同源代理访问）：
 
 ```bash
-curl -X POST "http://localhost:5002/search" \
+curl -X POST "http://localhost:5003/search" \
+     -H "Content-Type: application/json" \
+     -d '{"query": "猪肝", "limit": 3, "include_snippets": true}'
+
+# 或（推荐）：通过 NextChat 代理，避免浏览器跨域和容器主机名解析问题
+curl -X POST "http://<your-nextchat-host>:3000/api/bmf/search" \
      -H "Content-Type: application/json" \
      -d '{"query": "猪肝", "limit": 3, "include_snippets": true}'
 ```
@@ -34,8 +39,12 @@ curl -X POST "http://localhost:5002/search" \
 # 启用/禁用 BMF 搜索（默认：true）
 NEXT_PUBLIC_BMF_ENABLED=true
 
-# BMF 服务基础 URL（默认：http://localhost:5002）
-NEXT_PUBLIC_BMF_BASE_URL=http://localhost:5002
+# 前端基础 URL（默认：/api/bmf，通过同源代理访问）
+NEXT_PUBLIC_BMF_BASE_URL=/api/bmf
+
+# 服务端代理目标地址（NextChat容器访问BMF服务）
+# 跨Compose部署时，使用 host.docker.internal:5003 通过宿主机端口转发
+BMF_SERVER_BASE_URL=http://host.docker.internal:5003
 
 # 最大上下文 token 数量（默认：2000）
 NEXT_PUBLIC_BMF_MAX_CONTEXT_TOKENS=2000
@@ -62,7 +71,7 @@ NEXT_PUBLIC_BMF_ENHANCE_MIN_LENGTH=0
 node test-bmf.js
 
 # 使用自定义 URL 测试
-BMF_BASE_URL=http://your-bmf-service:5002 node test-bmf.js
+BMF_BASE_URL=http://your-bmf-service:5003 node test-bmf.js
 ```
 
 ## 工作流程

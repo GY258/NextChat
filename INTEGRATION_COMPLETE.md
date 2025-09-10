@@ -49,8 +49,11 @@
 # 启用/禁用 BMF 搜索
 NEXT_PUBLIC_BMF_ENABLED=true
 
-# BMF 服务地址
-NEXT_PUBLIC_BMF_BASE_URL=http://localhost:5002
+# 前端基础 URL（同源代理）
+NEXT_PUBLIC_BMF_BASE_URL=/api/bmf
+
+# 服务端代理目标地址（NextChat容器访问BMF服务）
+BMF_SERVER_BASE_URL=http://host.docker.internal:5003
 
 # 最大上下文长度
 NEXT_PUBLIC_BMF_MAX_CONTEXT_TOKENS=2000

@@ -21,7 +21,7 @@ info:
   description: Plugin for searching documents using BMF search service
   version: 1.0.0
 servers:
-  - url: http://localhost:5002
+  - url: /api/bmf
 paths:
   /search:
     post:

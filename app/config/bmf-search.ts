@@ -14,7 +14,7 @@ export interface BMFSearchConfig {
 
 export const DEFAULT_BMF_CONFIG: BMFSearchConfig = {
   enabled: true,
-  baseUrl: "http://localhost:5002",
+  baseUrl: "/api/bmf", // 通过同源代理路由，避免浏览器解析容器主机名
   maxContextTokens: 2000,
   searchLimit: 8,
   includeSnippets: true,

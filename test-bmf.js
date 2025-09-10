@@ -51,7 +51,7 @@ const fetch = globalThis.fetch || (async (url, options) => {
 });
 
 // BMF搜索服务配置
-const BMF_BASE_URL = process.env.BMF_BASE_URL || 'http://localhost:5002';
+const BMF_BASE_URL = process.env.BMF_BASE_URL || 'http://localhost:5003';
 
 async function testBMFService() {
   console.log('🧪 Testing BMF Search Service...');
